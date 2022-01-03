@@ -1,73 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:jo_sequal_software_pexels_app/models/wallpaper.dart';
 import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'wallpaper_grid_item.dart';
 
-class WallpapersGridView extends StatefulWidget {
-  const WallpapersGridView({
-    Key? key,
-  }) : super(key: key);
+class WallpapersGridView extends StatelessWidget {
+  final List<Wallpaper> wallpapers;
+  final bool canLoadMore;
+  const WallpapersGridView({Key? key, required this.wallpapers, this.canLoadMore = true})
+      : super(key: key);
 
-  @override
-  State<WallpapersGridView> createState() => _WallpapersGridViewState();
-}
-
-class _WallpapersGridViewState extends State<WallpapersGridView> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    _wallpapersFuture = _obtainWallpapersFuture();
-    super.initState();
-  }
-
-  Future? _wallpapersFuture;
-  Future _obtainWallpapersFuture() {
-    return Provider.of<WallpapersProvider>(context, listen: false).fetchAndSetWallpapers();
-  }
-
-  var requestCounter = 1;
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _wallpapersFuture,
-      builder: (context, dataSnapShot) {
-        if (dataSnapShot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
+    return GridView.builder(
+        itemCount: canLoadMore ? wallpapers.length + 1 : wallpapers.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 2 / 3,
+          mainAxisSpacing: 1,
+          crossAxisSpacing: 1,
+        ),
+        itemBuilder: (context, index) {
+          if (canLoadMore && index == wallpapers.length) {
+            return GestureDetector(
+              onTap: () {
+                Provider.of<WallpapersProvider>(context, listen: false)
+                    .fetchAndSetWallpapers(forceFetch: true);
+              },
+              child: const LoadMoreWallpapers(),
+            );
+          }
+          return WallpaperGridItem(
+            id: wallpapers[index].id!,
+            imageUrl: wallpapers[index].src!.medium!,
+            avgColor: wallpapers[index].avgColor!,
           );
-        } else if (dataSnapShot.hasError) {
-          return const Center(
-            child: Text('Something went wrong!'),
-          );
-        } else {
-          return Consumer<WallpapersProvider>(
-            builder: (context, wallpapersProvider, _) => GridView.builder(
-                itemCount: wallpapersProvider.wallpapers.length + 1,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 2 / 3,
-                  mainAxisSpacing: 1,
-                  crossAxisSpacing: 1,
-                ),
-                itemBuilder: (context, index) {
-                  if (index == wallpapersProvider.wallpapers.length) {
-                    return GestureDetector(
-                      onTap: () {
-                        Provider.of<WallpapersProvider>(context, listen: false)
-                            .fetchAndSetWallpapers(forceFetch: true, page: ++requestCounter);
-                      },
-                      child: const LoadMoreWallpapers(),
-                    );
-                  }
-                  return WallpaperGridItem(
-                    imageUrl: wallpapersProvider.wallpapers[index].src!.medium!,
-                  );
-                }),
-          );
-        }
-      },
-    );
+        });
   }
 }
 

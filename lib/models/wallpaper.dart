@@ -1,4 +1,6 @@
-class Wallpaper {
+import 'package:flutter/cupertino.dart';
+
+class Wallpaper with ChangeNotifier {
   final int? id;
   final int? width;
   final int? height;
@@ -6,6 +8,7 @@ class Wallpaper {
   final String? photographer;
   final String? photographerUrl;
   final int? photographerId;
+  final String? avgColor;
   final WallpaperSource? src;
   bool inFavorites;
   final String? alt;
@@ -18,10 +21,16 @@ class Wallpaper {
     this.photographer,
     this.photographerUrl,
     this.photographerId,
+    this.avgColor,
     this.src,
     this.inFavorites = false,
     this.alt,
   });
+
+  void toggleFavoriteStatus() {
+    inFavorites = !inFavorites;
+    notifyListeners();
+  }
 }
 
 class WallpaperSource {

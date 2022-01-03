@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:jo_sequal_software_pexels_app/modules/favorites/favorties_screen.dart';
 import 'package:jo_sequal_software_pexels_app/modules/home/home_screen.dart';
 import 'package:jo_sequal_software_pexels_app/modules/search/search_screen.dart';
+import 'package:jo_sequal_software_pexels_app/providers/searched_wallpapers_provider.dart';
+import 'package:provider/provider.dart';
 
 class AppLayout extends StatefulWidget {
   const AppLayout({Key? key}) : super(key: key);
@@ -21,10 +23,13 @@ class _AppLayoutState extends State<AppLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('Pexels'),
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(SearchScreen.routeName);
+              Navigator.of(context).pushNamed(SearchScreen.routeName).then((value) =>
+                  Provider.of<SearchedWallpapersProvider>(context, listen: false)
+                      .clearSearchResults());
             },
             icon: const Icon(Icons.search),
           )

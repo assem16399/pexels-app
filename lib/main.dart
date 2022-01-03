@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:jo_sequal_software_pexels_app/layout/app_layout.dart';
 import 'package:jo_sequal_software_pexels_app/modules/search/search_screen.dart';
 import 'package:jo_sequal_software_pexels_app/modules/wallpaper_details/wallpaper_details_screen.dart';
+import 'package:jo_sequal_software_pexels_app/providers/searched_wallpapers_provider.dart';
 import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart';
 import 'package:jo_sequal_software_pexels_app/shared/styles/themes.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context) => WallpapersProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (context) => WallpapersProvider()),
+        ChangeNotifierProvider(create: (context) => SearchedWallpapersProvider()),
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: appTheme,

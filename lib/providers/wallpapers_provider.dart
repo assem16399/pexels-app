@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:jo_sequal_software_pexels_app/models/wallpaper.dart';
-import 'package:jo_sequal_software_pexels_app/shared/components/constants.dart';
+import 'package:jo_sequal_software_pexels_app/shared/network/remote/http_helper.dart';
 
 class WallpapersProvider with ChangeNotifier {
   List<Wallpaper> _wallpapers = [];
@@ -12,13 +11,29 @@ class WallpapersProvider with ChangeNotifier {
     return [..._wallpapers];
   }
 
-  Future<void> fetchAndSetWallpapers({bool forceFetch = false, int page = 1}) async {
+  List<Wallpaper> get favoriteWallpapers {
+    return _wallpapers.where((wallpaper) => wallpaper.inFavorites).toList();
+  }
+
+  Wallpaper findPhotoById(int id) {
+    return _wallpapers.firstWhere((wallpaper) => wallpaper.id == id);
+  }
+
+  void toggleFavorites(int id) {
+    final photo = findPhotoById(id);
+    photo.inFavorites = !photo.inFavorites;
+    notifyListeners();
+  }
+
+  var pageRequestCounter = 1;
+  Future<void> fetchAndSetWallpapers({bool forceFetch = false}) async {
     if (_wallpapers.isEmpty || forceFetch) {
-      final url = Uri.parse('https://api.pexels.com/v1/curated?per_page=11&page=$page');
+      if (forceFetch) {
+        pageRequestCounter++;
+      }
       try {
-        final response = await http.get(url, headers: {
-          'Authorization': kPexelsApiKey,
-        });
+        final response = await HttpHelper.getRequest('https://api.pexels'
+            '.com/v1/curated?per_page=11&page=$pageRequestCounter');
         final extractedData = jsonDecode(response.body) as Map<String, dynamic>?;
         if (extractedData == null) return;
         List<Wallpaper> loadedWallpapers = [];
@@ -32,6 +47,7 @@ class WallpapersProvider with ChangeNotifier {
               alt: wallpaper['alt'],
               photographer: wallpaper['photographer'],
               photographerId: wallpaper['photographer_id'],
+              avgColor: wallpaper['avg_color'],
               photographerUrl: wallpaper['photographer_url'],
               src: WallpaperSource(
                 original: wallpaper['src']['original'],
@@ -47,7 +63,6 @@ class WallpapersProvider with ChangeNotifier {
         });
         _wallpapers.addAll(loadedWallpapers);
         notifyListeners();
-        print(_wallpapers[0].src!.medium);
       } catch (error) {
         rethrow;
       }
