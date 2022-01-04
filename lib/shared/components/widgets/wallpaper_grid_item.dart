@@ -13,17 +13,19 @@ class WallpaperGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).pushNamed(WallpaperDetailsScreen.routeName, arguments: id);
-      },
+    return Material(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Container(
-        color: HexColor(avgColor),
-        child: FadeInImage.memoryNetwork(
-          placeholder: kTransparentImage,
-          image: imageUrl,
-          fit: BoxFit.cover,
-        ),
+        decoration:
+            BoxDecoration(color: HexColor(avgColor), borderRadius: BorderRadius.circular(5)),
+        child: ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: imageUrl,
+              fit: BoxFit.cover,
+            )),
       ),
     );
   }

@@ -25,15 +25,17 @@ class WallpapersProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  var pageRequestCounter = 1;
+  var _pageRequestCounter = 1;
+  var _requestedWallpapers = 11;
   Future<void> fetchAndSetWallpapers({bool forceFetch = false}) async {
     if (_wallpapers.isEmpty || forceFetch) {
       if (forceFetch) {
-        pageRequestCounter++;
+        _pageRequestCounter++;
+        _requestedWallpapers = 12;
       }
       try {
         final response = await HttpHelper.getRequest('https://api.pexels'
-            '.com/v1/curated?per_page=11&page=$pageRequestCounter');
+            '.com/v1/curated?per_page=$_requestedWallpapers&page=$_pageRequestCounter');
         final extractedData = jsonDecode(response.body) as Map<String, dynamic>?;
         if (extractedData == null) return;
         List<Wallpaper> loadedWallpapers = [];

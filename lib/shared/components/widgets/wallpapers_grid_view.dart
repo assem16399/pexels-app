@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jo_sequal_software_pexels_app/models/wallpaper.dart';
+import 'package:jo_sequal_software_pexels_app/modules/wallpaper_details/wallpaper_details_screen.dart';
 import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -13,30 +14,39 @@ class WallpapersGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-        itemCount: canLoadMore ? wallpapers.length + 1 : wallpapers.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 2 / 3,
-          mainAxisSpacing: 1,
-          crossAxisSpacing: 1,
-        ),
-        itemBuilder: (context, index) {
-          if (canLoadMore && index == wallpapers.length) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: GridView.builder(
+          itemCount: canLoadMore ? wallpapers.length + 1 : wallpapers.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            childAspectRatio: 2 / 4,
+            mainAxisSpacing: 5,
+            crossAxisSpacing: 5,
+          ),
+          itemBuilder: (context, index) {
+            if (canLoadMore && index == wallpapers.length) {
+              return GestureDetector(
+                onTap: () {
+                  Provider.of<WallpapersProvider>(context, listen: false)
+                      .fetchAndSetWallpapers(forceFetch: true);
+                },
+                child: const LoadMoreWallpapers(),
+              );
+            }
             return GestureDetector(
               onTap: () {
-                Provider.of<WallpapersProvider>(context, listen: false)
-                    .fetchAndSetWallpapers(forceFetch: true);
+                Navigator.of(context)
+                    .pushNamed(WallpaperDetailsScreen.routeName, arguments: wallpapers[index].id!);
               },
-              child: const LoadMoreWallpapers(),
+              child: WallpaperGridItem(
+                id: wallpapers[index].id!,
+                imageUrl: wallpapers[index].src!.medium!,
+                avgColor: wallpapers[index].avgColor!,
+              ),
             );
-          }
-          return WallpaperGridItem(
-            id: wallpapers[index].id!,
-            imageUrl: wallpapers[index].src!.medium!,
-            avgColor: wallpapers[index].avgColor!,
-          );
-        });
+          }),
+    );
   }
 }
 
