@@ -21,7 +21,7 @@ class _AppLayoutState extends State<AppLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pexels'),
+        title: const Text('Pexels'),
         actions: [
           IconButton(
             onPressed: () {

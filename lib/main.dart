@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jo_sequal_software_pexels_app/layout/app_layout.dart';
 import 'package:jo_sequal_software_pexels_app/modules/search/search_screen.dart';
 import 'package:jo_sequal_software_pexels_app/modules/wallpaper_details/wallpaper_details_screen.dart';
@@ -7,7 +8,18 @@ import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart
 import 'package:jo_sequal_software_pexels_app/shared/styles/themes.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+import 'models/wallpaper.dart';
+import 'shared/network/local/hive_helper.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Hive.registerAdapter(WallpaperSourceAdapter());
+  Hive.registerAdapter(WallpaperAdapter());
+
+  await Hive.initFlutter();
+
+  await HiveHelper.openHiveBox('favorites');
+
   runApp(const MyApp());
 }
 

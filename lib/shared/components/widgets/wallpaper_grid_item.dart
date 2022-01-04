@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:jo_sequal_software_pexels_app/modules/wallpaper_details/wallpaper_details_screen.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class WallpaperGridItem extends StatelessWidget {

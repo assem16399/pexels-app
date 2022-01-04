@@ -11,23 +11,16 @@ class WallpapersProvider with ChangeNotifier {
     return [..._homeWallpapers];
   }
 
-  List<Wallpaper> get favoriteWallpapers {
-    return _homeWallpapers.where((wallpaper) => wallpaper.inFavorites).toList();
-  }
-
   Wallpaper findWallpaperById(int id) {
     return _homeWallpapers.firstWhere((wallpaper) => wallpaper.id == id);
   }
 
   void addWallpaperToWallpapers(Wallpaper addedWallpaper) {
-    print('check to add');
     if (!_homeWallpapers.contains(addedWallpaper)) {
       _homeWallpapers.add(addedWallpaper);
       _isNewlyAdded = true;
       notifyListeners();
-      print('added');
     }
-    print('did not add');
   }
 
   var _isNewlyAdded = false;
