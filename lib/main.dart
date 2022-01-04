@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         theme: appTheme,
         home: const AppLayout(),
         routes: {
-          SearchScreen.routeName: (context) => SearchScreen(),
+          SearchScreen.routeName: (context) => const SearchScreen(),
           WallpaperDetailsScreen.routeName: (context) => const WallpaperDetailsScreen(),
         },
       ),

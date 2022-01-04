@@ -4,6 +4,7 @@ import 'package:jo_sequal_software_pexels_app/modules/wallpaper_details/wallpape
 import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart';
 import 'package:provider/provider.dart';
 
+import 'load_more_wallpapers.dart';
 import 'wallpaper_grid_item.dart';
 
 enum ScreenName { home, search, favorites }
@@ -18,6 +19,20 @@ class WallpapersGridView extends StatelessWidget {
       this.canLoadMore = true,
       this.screenName = ScreenName.home})
       : super(key: key);
+
+  void manageWallpaperDetailsNavigation(BuildContext context, Wallpaper wallpaper) {
+    final wallpapersProvider = Provider.of<WallpapersProvider>(context, listen: false);
+    if (screenName != ScreenName.home) {
+      wallpapersProvider.addWallpaperToWallpapers(wallpaper);
+    }
+    Navigator.of(context)
+        .pushNamed(WallpaperDetailsScreen.routeName, arguments: wallpaper.id!)
+        .then((_) {
+      if (screenName != ScreenName.home) {
+        wallpapersProvider.removeNewlyAddedWallpaper();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +58,7 @@ class WallpapersGridView extends StatelessWidget {
             }
             return GestureDetector(
               onTap: () {
-                final wallpapersProvider = Provider.of<WallpapersProvider>(context, listen: false);
-                wallpapersProvider.addWallpaperToWallpapers(wallpapers[index]);
-                Navigator.of(context)
-                    .pushNamed(WallpaperDetailsScreen.routeName, arguments: wallpapers[index].id!)
-                    .then((_) {
-                  if (screenName != ScreenName.home && wallpapersProvider.isNewlyAdded) {
-                    wallpapersProvider.removeWallpaperFromAllWallpapers(wallpapers[index].id!);
-                  }
-                });
+                manageWallpaperDetailsNavigation(context, wallpapers[index]);
               },
               child: WallpaperGridItem(
                 id: wallpapers[index].id!,
@@ -60,33 +67,6 @@ class WallpapersGridView extends StatelessWidget {
               ),
             );
           }),
-    );
-  }
-}
-
-class LoadMoreWallpapers extends StatelessWidget {
-  const LoadMoreWallpapers({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.grey,
-      child: Center(
-        child: Container(
-          width: 60,
-          height: 60,
-          decoration: const ShapeDecoration(
-            shape: CircleBorder(),
-            color: Colors.black54,
-          ),
-          child: const Icon(
-            Icons.add,
-            size: 40,
-          ),
-        ),
-      ),
     );
   }
 }

@@ -19,25 +19,24 @@ class WallpapersProvider with ChangeNotifier {
     return _homeWallpapers.firstWhere((wallpaper) => wallpaper.id == id);
   }
 
-  void toggleFavorites(int id) {
-    final photo = findWallpaperById(id);
-    photo.inFavorites = !photo.inFavorites;
-    notifyListeners();
-  }
-
   void addWallpaperToWallpapers(Wallpaper addedWallpaper) {
+    print('check to add');
     if (!_homeWallpapers.contains(addedWallpaper)) {
       _homeWallpapers.add(addedWallpaper);
-      isNewlyAdded = true;
+      _isNewlyAdded = true;
       notifyListeners();
+      print('added');
     }
+    print('did not add');
   }
 
-  var isNewlyAdded = false;
-  void removeWallpaperFromAllWallpapers(int id) {
-    _homeWallpapers.removeWhere((wallpaper) => wallpaper.id == id);
-    isNewlyAdded = false;
-    notifyListeners();
+  var _isNewlyAdded = false;
+  void removeNewlyAddedWallpaper([int id = 0]) {
+    if (_isNewlyAdded) {
+      _homeWallpapers.removeLast();
+      _isNewlyAdded = false;
+      notifyListeners();
+    }
   }
 
   var _pageRequestCounter = 1;

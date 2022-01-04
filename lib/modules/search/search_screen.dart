@@ -7,7 +7,7 @@ import 'package:jo_sequal_software_pexels_app/shared/components/widgets/wallpape
 import 'package:jo_sequal_software_pexels_app/shared/network/remote/http_helper.dart';
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({Key? key}) : super(key: key);
   static const routeName = '/search';
 
   @override
@@ -15,13 +15,16 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final searchController = TextEditingController();
   final List<Wallpaper> _searchedWallpapers = [];
 
   Future<void> searchForWallpapers(String query) async {
     setState(() {
       _searchedWallpapers.clear();
     });
+    if (query.isEmpty) {
+      toast('Enter Something To Search For');
+      return;
+    }
     try {
       final response =
           await HttpHelper.getRequest('https://api.pexels.com/v1/search?query=$query&per_page=20');
@@ -54,8 +57,11 @@ class _SearchScreenState extends State<SearchScreen> {
           );
         });
       });
-    } catch (error) {
-      rethrow;
+      if (_searchedWallpapers.isEmpty) {
+        toast('No results found, Try again');
+      }
+    } catch (_) {
+      toast('Something Went Wrong!');
     }
   }
 
@@ -73,27 +79,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   TextField(
                     textInputAction: TextInputAction.search,
-                    controller: searchController,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                       label: Text('Search For what you are looking for'),
                     ),
-                    onSubmitted: (value) async {
-                      if (value.isEmpty) {
-                        toast('Enter Something To Search For');
-                        return;
-                      }
-                      try {
-                        await searchForWallpapers(value);
-
-                        if (_searchedWallpapers.isEmpty) {
-                          toast('No results found, Try again');
-                        }
-                      } catch (_) {
-                        toast('Something Went Wrong!');
-                      }
-                    },
+                    onSubmitted: (value) async => searchForWallpapers(value),
                   ),
                 ],
               ),
