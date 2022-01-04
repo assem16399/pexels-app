@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:jo_sequal_software_pexels_app/providers/favorites_provider.dart';
 import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -13,8 +14,7 @@ class WallpaperDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final id = ModalRoute.of(context)!.settings.arguments as int;
-    final photoProvider = Provider.of<WallpapersProvider>(context);
-    final photo = photoProvider.findWallpaperById(id);
+    final wallpaper = Provider.of<WallpapersProvider>(context, listen: false).findWallpaperById(id);
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),
@@ -22,12 +22,12 @@ class WallpaperDetailsScreen extends StatelessWidget {
         alignment: AlignmentDirectional.bottomEnd,
         children: [
           Container(
-            color: HexColor(photo.avgColor!),
+            color: HexColor(wallpaper.avgColor!),
             width: double.infinity,
             height: deviceSize.height,
             child: FadeInImage.memoryNetwork(
               placeholder: kTransparentImage,
-              image: photo.src!.original!,
+              image: wallpaper.src!.original!,
               fit: BoxFit.cover,
             ),
           ),
@@ -44,7 +44,7 @@ class WallpaperDetailsScreen extends StatelessWidget {
                       //
                       try {
                         // Saved with this method.
-                        var imageId = await ImageDownloader.downloadImage(photo.src!.original!);
+                        var imageId = await ImageDownloader.downloadImage(wallpaper.src!.original!);
                         if (imageId == null) {
                           return;
                         }
@@ -60,12 +60,16 @@ class WallpaperDetailsScreen extends StatelessWidget {
                     },
                     child: const Icon(Icons.arrow_circle_down_sharp),
                   ),
-                  FloatingActionButton(
-                    heroTag: 'favorite',
-                    onPressed: () {
-                      photoProvider.toggleFavorites(id);
-                    },
-                    child: Icon(photo.inFavorites ? Icons.favorite : Icons.favorite_border),
+                  Consumer<FavoritesProvider>(
+                    builder: (context, favoritesProvider, _) => FloatingActionButton(
+                      heroTag: 'favorite',
+                      onPressed: () {
+                        favoritesProvider.toggleFavoriteStatus(id: id, wallpaper: wallpaper);
+                      },
+                      child: Icon(favoritesProvider.wallpapers.containsKey(id)
+                          ? Icons.favorite
+                          : Icons.favorite_border),
+                    ),
                   ),
                 ],
               ),

@@ -5,8 +5,6 @@ import 'package:jo_sequal_software_pexels_app/models/wallpaper.dart';
 import 'package:jo_sequal_software_pexels_app/shared/network/remote/http_helper.dart';
 
 class WallpapersProvider with ChangeNotifier {
-  final List<Wallpaper> _allWallpapers = [];
-
   final List<Wallpaper> _homeWallpapers = [];
 
   List<Wallpaper> get wallpapers {
@@ -14,11 +12,11 @@ class WallpapersProvider with ChangeNotifier {
   }
 
   List<Wallpaper> get favoriteWallpapers {
-    return _allWallpapers.where((wallpaper) => wallpaper.inFavorites).toList();
+    return _homeWallpapers.where((wallpaper) => wallpaper.inFavorites).toList();
   }
 
   Wallpaper findWallpaperById(int id) {
-    return _allWallpapers.firstWhere((wallpaper) => wallpaper.id == id);
+    return _homeWallpapers.firstWhere((wallpaper) => wallpaper.id == id);
   }
 
   void toggleFavorites(int id) {
@@ -27,15 +25,18 @@ class WallpapersProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addSearchedWallpaperToAllWallpaper(Wallpaper addedWallpaper) {
-    if (!_allWallpapers.contains(addedWallpaper)) {
-      _allWallpapers.add(addedWallpaper);
+  void addWallpaperToWallpapers(Wallpaper addedWallpaper) {
+    if (!_homeWallpapers.contains(addedWallpaper)) {
+      _homeWallpapers.add(addedWallpaper);
+      isNewlyAdded = true;
       notifyListeners();
     }
   }
 
-  void cleanUnFavoritesWallpaperFromAllWallpaper() {
-    _allWallpapers.removeWhere((wallpaper) => !wallpaper.inFavorites);
+  var isNewlyAdded = false;
+  void removeWallpaperFromAllWallpapers(int id) {
+    _homeWallpapers.removeWhere((wallpaper) => wallpaper.id == id);
+    isNewlyAdded = false;
     notifyListeners();
   }
 
@@ -78,7 +79,6 @@ class WallpapersProvider with ChangeNotifier {
           );
         });
         _homeWallpapers.addAll(loadedWallpapers);
-        _allWallpapers.addAll(loadedWallpapers);
         notifyListeners();
       } catch (error) {
         rethrow;

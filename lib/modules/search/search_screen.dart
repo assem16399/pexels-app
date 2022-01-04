@@ -106,6 +106,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   height: deviceSize.height * 0.75,
                   child: WallpapersGridView(
                     wallpapers: _searchedWallpapers,
+                    screenName: ScreenName.search,
                     canLoadMore: false,
                   ),
                 ),

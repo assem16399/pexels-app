@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart';
+import 'package:jo_sequal_software_pexels_app/providers/favorites_provider.dart';
 import 'package:jo_sequal_software_pexels_app/shared/components/widgets/wallpapers_grid_view.dart';
 import 'package:provider/provider.dart';
 
@@ -8,13 +8,14 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final favoriteWallpapers = Provider.of<WallpapersProvider>(context).favoriteWallpapers;
+    final favoriteWallpapers = Provider.of<FavoritesProvider>(context).wallpapers;
     return favoriteWallpapers.isEmpty
         ? const Center(
             child: Text('Start Adding Some Favorites'),
           )
         : WallpapersGridView(
-            wallpapers: favoriteWallpapers,
+            wallpapers: favoriteWallpapers.values.toList(),
+            screenName: ScreenName.favorites,
             canLoadMore: false,
           );
   }

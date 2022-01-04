@@ -6,10 +6,17 @@ import 'package:provider/provider.dart';
 
 import 'wallpaper_grid_item.dart';
 
+enum ScreenName { home, search, favorites }
+
 class WallpapersGridView extends StatelessWidget {
   final List<Wallpaper> wallpapers;
   final bool canLoadMore;
-  const WallpapersGridView({Key? key, required this.wallpapers, this.canLoadMore = true})
+  final ScreenName screenName;
+  const WallpapersGridView(
+      {Key? key,
+      required this.wallpapers,
+      this.canLoadMore = true,
+      this.screenName = ScreenName.home})
       : super(key: key);
 
   @override
@@ -36,10 +43,15 @@ class WallpapersGridView extends StatelessWidget {
             }
             return GestureDetector(
               onTap: () {
-                Provider.of<WallpapersProvider>(context, listen: false)
-                    .addSearchedWallpaperToAllWallpaper(wallpapers[index]);
+                final wallpapersProvider = Provider.of<WallpapersProvider>(context, listen: false);
+                wallpapersProvider.addWallpaperToWallpapers(wallpapers[index]);
                 Navigator.of(context)
-                    .pushNamed(WallpaperDetailsScreen.routeName, arguments: wallpapers[index].id!);
+                    .pushNamed(WallpaperDetailsScreen.routeName, arguments: wallpapers[index].id!)
+                    .then((_) {
+                  if (screenName != ScreenName.home && wallpapersProvider.isNewlyAdded) {
+                    wallpapersProvider.removeWallpaperFromAllWallpapers(wallpapers[index].id!);
+                  }
+                });
               },
               child: WallpaperGridItem(
                 id: wallpapers[index].id!,
