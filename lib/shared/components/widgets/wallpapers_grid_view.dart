@@ -36,6 +36,8 @@ class WallpapersGridView extends StatelessWidget {
             }
             return GestureDetector(
               onTap: () {
+                Provider.of<WallpapersProvider>(context, listen: false)
+                    .addSearchedWallpaperToAllWallpaper(wallpapers[index]);
                 Navigator.of(context)
                     .pushNamed(WallpaperDetailsScreen.routeName, arguments: wallpapers[index].id!);
               },

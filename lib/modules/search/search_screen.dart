@@ -1,18 +1,67 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:jo_sequal_software_pexels_app/providers/searched_wallpapers_provider.dart';
+import 'package:jo_sequal_software_pexels_app/models/wallpaper.dart';
 import 'package:jo_sequal_software_pexels_app/shared/components/toast.dart';
 import 'package:jo_sequal_software_pexels_app/shared/components/widgets/wallpapers_grid_view.dart';
-import 'package:provider/provider.dart';
+import 'package:jo_sequal_software_pexels_app/shared/network/remote/http_helper.dart';
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
   SearchScreen({Key? key}) : super(key: key);
   static const routeName = '/search';
 
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
   final searchController = TextEditingController();
+  final List<Wallpaper> _searchedWallpapers = [];
+
+  Future<void> searchForWallpapers(String query) async {
+    setState(() {
+      _searchedWallpapers.clear();
+    });
+    try {
+      final response =
+          await HttpHelper.getRequest('https://api.pexels.com/v1/search?query=$query&per_page=20');
+      final extractedData = jsonDecode(response.body) as Map<String, dynamic>?;
+      if (extractedData == null) return;
+
+      extractedData['photos'].forEach((wallpaper) {
+        setState(() {
+          _searchedWallpapers.add(
+            Wallpaper(
+              id: wallpaper['id'],
+              width: wallpaper['width'],
+              height: wallpaper['height'],
+              imageUrl: wallpaper['image_url'],
+              alt: wallpaper['alt'],
+              photographer: wallpaper['photographer'],
+              photographerId: wallpaper['photographer_id'],
+              avgColor: wallpaper['avg_color'],
+              photographerUrl: wallpaper['photographer_url'],
+              src: WallpaperSource(
+                original: wallpaper['src']['original'],
+                large2x: wallpaper['src']['large2x'],
+                large: wallpaper['src']['large'],
+                medium: wallpaper['src']['medium'],
+                portrait: wallpaper['src']['portrait'],
+                small: wallpaper['src']['small'],
+                tiny: wallpaper['src']['tiny'],
+              ),
+            ),
+          );
+        });
+      });
+    } catch (error) {
+      rethrow;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    final searchedWallpapers = Provider.of<SearchedWallpapersProvider>(context).searchedWallpapers;
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -33,13 +82,12 @@ class SearchScreen extends StatelessWidget {
                     onSubmitted: (value) async {
                       if (value.isEmpty) {
                         toast('Enter Something To Search For');
+                        return;
                       }
                       try {
-                        await Provider.of<SearchedWallpapersProvider>(context, listen: false)
-                            .searchForWallpapers(value);
-                        print(searchedWallpapers.length);
-                        if (searchedWallpapers.isEmpty) {
-                          print('here');
+                        await searchForWallpapers(value);
+
+                        if (_searchedWallpapers.isEmpty) {
                           toast('No results found, Try again');
                         }
                       } catch (_) {
@@ -50,14 +98,14 @@ class SearchScreen extends StatelessWidget {
                 ],
               ),
             ),
-            if (searchedWallpapers.isNotEmpty)
+            if (_searchedWallpapers.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: SizedBox(
                   width: double.infinity,
                   height: deviceSize.height * 0.75,
                   child: WallpapersGridView(
-                    wallpapers: searchedWallpapers,
+                    wallpapers: _searchedWallpapers,
                     canLoadMore: false,
                   ),
                 ),

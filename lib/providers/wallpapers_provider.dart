@@ -5,30 +5,44 @@ import 'package:jo_sequal_software_pexels_app/models/wallpaper.dart';
 import 'package:jo_sequal_software_pexels_app/shared/network/remote/http_helper.dart';
 
 class WallpapersProvider with ChangeNotifier {
-  List<Wallpaper> _wallpapers = [];
+  final List<Wallpaper> _allWallpapers = [];
+
+  final List<Wallpaper> _homeWallpapers = [];
 
   List<Wallpaper> get wallpapers {
-    return [..._wallpapers];
+    return [..._homeWallpapers];
   }
 
   List<Wallpaper> get favoriteWallpapers {
-    return _wallpapers.where((wallpaper) => wallpaper.inFavorites).toList();
+    return _allWallpapers.where((wallpaper) => wallpaper.inFavorites).toList();
   }
 
-  Wallpaper findPhotoById(int id) {
-    return _wallpapers.firstWhere((wallpaper) => wallpaper.id == id);
+  Wallpaper findWallpaperById(int id) {
+    return _allWallpapers.firstWhere((wallpaper) => wallpaper.id == id);
   }
 
   void toggleFavorites(int id) {
-    final photo = findPhotoById(id);
+    final photo = findWallpaperById(id);
     photo.inFavorites = !photo.inFavorites;
+    notifyListeners();
+  }
+
+  void addSearchedWallpaperToAllWallpaper(Wallpaper addedWallpaper) {
+    if (!_allWallpapers.contains(addedWallpaper)) {
+      _allWallpapers.add(addedWallpaper);
+      notifyListeners();
+    }
+  }
+
+  void cleanUnFavoritesWallpaperFromAllWallpaper() {
+    _allWallpapers.removeWhere((wallpaper) => !wallpaper.inFavorites);
     notifyListeners();
   }
 
   var _pageRequestCounter = 1;
   var _requestedWallpapers = 11;
   Future<void> fetchAndSetWallpapers({bool forceFetch = false}) async {
-    if (_wallpapers.isEmpty || forceFetch) {
+    if (_homeWallpapers.isEmpty || forceFetch) {
       if (forceFetch) {
         _pageRequestCounter++;
         _requestedWallpapers = 12;
@@ -63,7 +77,8 @@ class WallpapersProvider with ChangeNotifier {
             ),
           );
         });
-        _wallpapers.addAll(loadedWallpapers);
+        _homeWallpapers.addAll(loadedWallpapers);
+        _allWallpapers.addAll(loadedWallpapers);
         notifyListeners();
       } catch (error) {
         rethrow;

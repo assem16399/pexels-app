@@ -14,7 +14,7 @@ class WallpaperDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final id = ModalRoute.of(context)!.settings.arguments as int;
     final photoProvider = Provider.of<WallpapersProvider>(context);
-    final photo = photoProvider.findPhotoById(id);
+    final photo = photoProvider.findWallpaperById(id);
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),
