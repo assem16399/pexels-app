@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -60,6 +61,8 @@ class _SearchScreenState extends State<SearchScreen> {
       if (_searchedWallpapers.isEmpty) {
         toast('No results found, Try again');
       }
+    } on TimeoutException catch (_) {
+      toast('Timeout!! Check Your Internet Connection');
     } catch (_) {
       toast('Something Went Wrong!');
     }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -72,7 +73,9 @@ class WallpapersProvider with ChangeNotifier {
         });
         _homeWallpapers.addAll(loadedWallpapers);
         notifyListeners();
-      } catch (error) {
+      } on TimeoutException catch (_) {
+        rethrow;
+      } catch (_) {
         rethrow;
       }
     }

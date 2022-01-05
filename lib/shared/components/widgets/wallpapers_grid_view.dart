@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:jo_sequal_software_pexels_app/models/wallpaper.dart';
 import 'package:jo_sequal_software_pexels_app/modules/wallpaper_details/wallpaper_details_screen.dart';
 import 'package:jo_sequal_software_pexels_app/providers/wallpapers_provider.dart';
+import 'package:jo_sequal_software_pexels_app/shared/components/toast.dart';
 import 'package:provider/provider.dart';
 
 import 'load_more_wallpapers.dart';
@@ -49,9 +52,15 @@ class WallpapersGridView extends StatelessWidget {
           itemBuilder: (context, index) {
             if (canLoadMore && index == wallpapers.length) {
               return GestureDetector(
-                onTap: () {
-                  Provider.of<WallpapersProvider>(context, listen: false)
-                      .fetchAndSetWallpapers(forceFetch: true);
+                onTap: () async {
+                  try {
+                    await Provider.of<WallpapersProvider>(context, listen: false)
+                        .fetchAndSetWallpapers(forceFetch: true);
+                  } on TimeoutException catch (_) {
+                    toast('Timeout!! Check Your Internet Connection');
+                  } catch (_) {
+                    toast('Something Went Wrong!!');
+                  }
                 },
                 child: const LoadMoreWallpapers(),
               );
