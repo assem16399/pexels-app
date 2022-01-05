@@ -7,8 +7,8 @@ abstract class HttpHelper {
   static Future<http.Response> getRequest(String apiUrl) async {
     final url = Uri.parse(apiUrl);
     try {
-      return await http
-          .get(url, headers: {'Authorization': kPexelsApiKey}).timeout(const Duration(seconds: 10));
+      return await http.get(url,
+          headers: {'Authorization': kPexelsApiKey}).timeout(const Duration(seconds: 100));
     } on TimeoutException catch (_) {
       rethrow;
     } catch (error) {

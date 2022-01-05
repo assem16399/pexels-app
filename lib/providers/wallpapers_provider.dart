@@ -20,7 +20,7 @@ class WallpapersProvider with ChangeNotifier {
     if (!_homeWallpapers.contains(addedWallpaper)) {
       _homeWallpapers.add(addedWallpaper);
       _isNewlyAdded = true;
-      notifyListeners();
+      //notifyListeners();
     }
   }
 
@@ -29,7 +29,7 @@ class WallpapersProvider with ChangeNotifier {
     if (_isNewlyAdded) {
       _homeWallpapers.removeLast();
       _isNewlyAdded = false;
-      notifyListeners();
+      //notifyListeners();
     }
   }
 
